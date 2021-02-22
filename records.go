@@ -30,6 +30,23 @@ type Record struct {
 	UseAQB        string `json:"use_aqb,omitempty"`
 }
 
+type UpdateRecord struct {
+	ID            int64 `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	Line          string `json:"line,omitempty"`
+	LineID        string `json:"line_id,omitempty"`
+	Type          string `json:"type,omitempty"`
+	TTL           string `json:"ttl,omitempty"`
+	Value         string `json:"value,omitempty"`
+	MX            string `json:"mx,omitempty"`
+	Enabled       string `json:"enabled,omitempty"`
+	Status        string `json:"status,omitempty"`
+	MonitorStatus string `json:"monitor_status,omitempty"`
+	Remark        string `json:"remark,omitempty"`
+	UpdateOn      string `json:"updated_on,omitempty"`
+	UseAQB        string `json:"use_aqb,omitempty"`
+}
+
 type recordsWrapper struct {
 	Status  Status     `json:"status"`
 	Info    DomainInfo `json:"info"`
@@ -40,6 +57,12 @@ type recordWrapper struct {
 	Status Status     `json:"status"`
 	Info   DomainInfo `json:"info"`
 	Record Record     `json:"record"`
+}
+
+type updateRecordWrapper struct {
+	Status Status     `json:"status"`
+	Info   DomainInfo `json:"info"`
+	Record UpdateRecord     `json:"record"`
 }
 
 // RecordsService handles communication with the DNS records related methods of the dnspod API.
@@ -151,7 +174,7 @@ func (s *RecordsService) Get(domain string, recordID string) (Record, *Response,
 // Update Updates a domain record.
 //
 // dnspod API docs: https://www.dnspod.cn/docs/records.html#record-modify
-func (s *RecordsService) Update(domain string, recordID string, recordAttributes Record) (Record, *Response, error) {
+func (s *RecordsService) Update(domain string, recordID string, recordAttributes Record) (UpdateRecord, *Response, error) {
 	payload := s.client.CommonParams.toPayLoad()
 	payload.Add("domain_id", domain)
 	payload.Add("record_id", recordID)
@@ -188,11 +211,11 @@ func (s *RecordsService) Update(domain string, recordID string, recordAttributes
 		payload.Add("status", recordAttributes.Status)
 	}
 
-	returnedRecord := recordWrapper{}
+	returnedRecord := updateRecordWrapper{}
 
 	res, err := s.client.post(methodRecordModify, payload, &returnedRecord)
 	if err != nil {
-		return Record{}, res, err
+		return UpdateRecord{}, res, err
 	}
 
 	if returnedRecord.Status.Code != "1" {
